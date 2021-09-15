@@ -28,9 +28,10 @@ router.post("/", (req, res) => {
 });
 
 const findMateria = (id, { onSuccess, onNotFound, onError }) => {
+  console.log("paso por findMaterias");
   models.materia
     .findOne({
-      attributes: ["id_carrera", "nombre"],
+      attributes: ["id","id_carrera", "nombre"],
       where: { id }
     })
     .then(materia => (materia ? onSuccess(materia) : onNotFound()))
@@ -46,9 +47,10 @@ router.get("/:id", (req, res) => {
 });
 
 router.put("/:id", (req, res) => {
+    console.log("1");
   const onSuccess = materia =>
     materia
-          .update({ nombre: req.body.nombre,id_carrera: req.body.id_carrera }, { fields: ["nombre","id_carrera"] })
+          .update({id_carrera: req.body.id_carrera, nombre: req.body.nombre})
       .then(() => res.sendStatus(200))
       .catch(error => {
         if (error == "SequelizeUniqueConstraintError: Validation error") {
