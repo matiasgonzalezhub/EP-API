@@ -1,8 +1,30 @@
 var express = require("express");
 var router = express.Router();
 var models = require("../models");
+const jwt = require('jsonwebtoken');
 
-router.get("/", (req, res,next) => {
+const rutasProtegidas = express.Router(); 
+rutasProtegidas.use((req, res, next) => {
+    const token = req.headers['access-token'];
+ 
+  if (token) {
+      //Ver como puedo leer la clave desde el archivo de cnofiguracion
+      jwt.verify(token, "ClaveDeAcceso*", (err, decoded) => {      
+        if (err) {
+          return res.json({ mensaje: 'Token inválida' });    
+        } else {
+          req.decoded = decoded;    
+          next();
+        }
+      });
+    } else {
+      res.send({ 
+          mensaje: 'Token no proveída.' 
+      });
+    }
+});
+ 
+router.get("/", rutasProtegidas, (req, res,next) => {
 
   models.alumno.findAll({attributes: ["id","nombre","id_carrera"],
       
@@ -81,5 +103,24 @@ router.delete("/:id", (req, res) => {
     onError: () => res.sendStatus(500)
   });
 });
+
+/*
+router.post('/autenticar', (req, res) => {
+    if(true) {
+  const payload = {
+   check:  true
+  };
+  const token = jwt.sign(payload, app.get('llave'), {
+   expiresIn: 1440
+  });
+  res.json({
+   mensaje: 'Autenticación correcta',
+   token: token
+  });
+    } else {
+        res.json({ mensaje: "Usuario o contraseña incorrectos"})
+    }
+})
+*/
 
 module.exports = router;
