@@ -3,13 +3,16 @@ var router = express.Router();
 var models = require("../models");
 const jwt = require('jsonwebtoken');
 
-const rutasProtegidas = express.Router(); 
+const configKey = require('../configs/config');
+
+const rutasProtegidas = express.Router();
+
 rutasProtegidas.use((req, res, next) => {
-    const token = req.headers['access-token'];
+  const token = req.headers['access-token'];
  
   if (token) {
-      //Ver como puedo leer la clave desde el archivo de cnofiguracion
-      jwt.verify(token, "ClaveDeAcceso*", (err, decoded) => {      
+
+      jwt.verify(token, configKey.llave, (err, decoded) => {      
         if (err) {
           return res.json({ mensaje: 'Token inválida' });    
         } else {
